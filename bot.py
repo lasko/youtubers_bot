@@ -6,6 +6,32 @@ import time
 import sqlite3
 import re
 
+
+# TODO:
+#       - When a user posts a review for someone else's review/critique thread, they earn a point.
+#         (So, the first time they post in Review or Critique threads they didn't make themselves,
+#         and ONLY the first time they post in that thread, they get a point added to their account.)
+#
+#       - When a user posts their OWN Review or Critique thread, the bot deducts two points from their account.
+#         (This way they have to do two reviews for other users to "pay" for each of their own threads.)
+#
+#       - If the bot tries to deduct the two points and finds the new balance would be less than 0, the potential
+#         points are refunded, the thread is automatically discarded, and the user is notified that they didn't
+#         have enough points to post a review thread. (User has 1 point, they make a thread, deleted. The user STILL
+#         has one point, and a comment is posted to the deleted thread: "Your thread was deleted because your current
+#         point balance is: 1 point. Review/Critique threads cost two
+#         points to post! You can earn more points by reviewing other peoples' videos and channels!")
+#
+#       - It would be nice if users could ping the bot via pm to check their balance
+#         ("Message to TuberBot: Balance" > "Message to SxyThor1234: 18 points.")
+#
+#       - It would be nice if we mods could add or subtract points manually, in case something goes wrong
+#         (Wow, that user commented "." on sixteen threads. I'm reducing his balance to zero and banning him.)
+#
+#       - It might also be prudent to only give points for recent threads. So once the thread is a week old,
+#         new reviews won't earn points. Just to prevent sneaky shenanigans.
+#
+
 class Bot(object):
     def __init__(self):
         self.__version__ = "1.5"
