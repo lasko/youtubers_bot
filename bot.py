@@ -82,26 +82,40 @@ class Bot(object):
         if placeholder_comment:
             posts = sr.get_comments(placeholder = placeholder_comment)
         else:
+            # Get 20 comments
             posts = sr.get_comments(limit = 20)
+        # for each post in our list of posts
         for post in posts:
+            # set pid equal to the post id
             pid = post.id
             try:
+                # set the post author name as a variable
                 pauthor = post.author.name
             except AttributeError:
+                # If there was an error setting this variable
+                # Set the variable author name to "[DELETE]"
                 pauthor = "[DELETED]"
+            # Set variable for the posts permalink
             plink = post.permalink
             print("Scanning id: " + pid)
+            # Define a variable for the posts body
             pbody = post.body.lower()
+            # Set a comment variable, None typed.
             comment = None
+            # Check if the body of the post has the phrase "getscore!"
             if "getscore! " in pbody:
                 print("Found " + pid + " by " + pauthor)
+                # Find the username in the post
                 uname = re.findall(r'getscore!\s"+(.*)"+', pbody)[0]
+                # query the database for the username.
                 self.cur.execute('SELECT * FROM points WHERE NAME=?', (uname,))
+                # Check if the username is in the ignore list.
                 if uname in ignore_list:
                     print("Someone tried GetScore! on someone in the ignore list")
                     post.reply("{} is ignore in the point system.".format(uname))
                 elif cur.fetchone():
                     print("Replying with " + self.cur.fetchone()[0])
+                    # Post a reply to the user and provide a the points value to the user as a post reply.
                     post.reply("{} has a score of {}.".format(uname self.cur.fetchone()[0]))
                     print("Permalink: " + plink)
                 else:
@@ -115,6 +129,7 @@ class Bot(object):
                     post.reply("{} is ignored in the point system.".format(uname))
                 elif cur.fetchone():
                     self.cur.execute("UPDATE points SET AMOUNT = AMOUNT + 1 WHERE NAME = ?", (parent_name,))
+                    self.add_point_to_user(parent_name)
                     post.reply("Point awarded to {}.".format(parent_name))
                 else:
                     self.cur.execute('INSERT INTO points VALUES(?, ?)', (1, parent_name))
@@ -123,6 +138,7 @@ class Bot(object):
         if placeholder_submission:
             threads = sr.get_new(placeholder = placeholder_submission)
         else:
+            # Get the newest 15 threads.
             threads = sr.get_new(limit = 15)
         for thread in threads:
             self.cur.execute("SELECT * FROM alreadydone WHERE THREADID=?", (thread.id,))
@@ -140,11 +156,24 @@ class Bot(object):
                     self.cur.execute("INSERT INTO alreadydone VALUES(?)", (thread.id,))
                 else:
                     self.cur.execute("INSERT INTO alreadydone VALUES(?)", (thread.id,))
-                    self.cur.execute("UPDATE points SET AMOUNT = AMOUNT - 2 WHERE NAME = ?", (thread.author.name,))
+                    self.remove_points_from_user(thread.author.name)
             placeholder_submission = thread.id
         self.db_commit()
         self.db_close()
         return placeholder_submission, placeholder_comment
+
+    def get_user_points(self, user):
+        return
+
+    def remove_points_from_user(self, post):
+        self.cur.execute("UPDATE points SET AMOUNT = AMOUNT -2 WHERE NAME = ?", (post.author.name,))
+        self.db_commit()
+        return
+
+    def add_point_to_user(self, user_name):
+        self.cur.execute("UPDATE points SET AMOUNT = AMOUNT + 1 WHERE NAME = ?", (user_name,))
+        self.db_commit()
+        return
 
 if __name__ == "__main__":
     # The time it sleeps after scanning the last 15 posts before scanning again in seconds. Default: 300
