@@ -1,8 +1,5 @@
 # encoding: utf-8
 
-# MARS #
-########
-
 # Import #
 ##########
 
