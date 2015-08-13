@@ -52,7 +52,11 @@ def process(data,msg,r,posts,cur,placeholder_comment):
         pid = post.id
         pauthor = get_author(post)
         pbody = post.body.lower()
-        if pauthor != "[DELETED]":
+        if pauthor != "[DELETED]" and post.link_author is not "[deleted]":
+            # TODO
+            # Get the Parent ID, username and store them in a dictionary.
+            # Then use this dictionary to compare -- that way we dont give a user
+            # multiple points for multiple posts to the same thread.
             comment_checked_status = check_alreadydone(pid,cur)
             if not comment_checked_status:
                 logging.debug("Comment has not been checked. Checking now.")
@@ -73,15 +77,14 @@ def process(data,msg,r,posts,cur,placeholder_comment):
                             #post.reply("User: %s -- currently has a balance of %s." %(post.author.name,points))
                 else:
                     logging.debug("No commands found in comment")
-
-                #mark_post_alreadydone(pid,cur)
             else:
                 continue
                 # This comment has already been checked. Skipping.
                 #logging.debug("This comment has already been checked. Skipping.")
         else:
             logging.debug("This user/post was deleted: User is '[DELETED]'")
-            mark_post_alreadydone(pid,cur)
+
+        mark_post_alreadydone(pid,cur)
         placeholder_comment = pid
     return placeholder_comment
 
@@ -116,9 +119,14 @@ def get_points(uname,cur):
     else:
         return False
 
-def set_points(uname,amount,cur):
-    logging.debug("Setting %s points for user: %s" %(amount, uname))
-    cur.execute("UPDATE points SET AMOUNT = AMOUNT ? WHERE NAME = ?", (uname,amount))
+def remove_points(uname,cur):
+    logging.debug("Removing 2 points for user: %s" %(uname))
+    cur.execute("UPDATE points SET AMOUNT = AMOUNT - 2 WHERE NAME = ?", (uname,))
+    return
+
+def add_points(uname,cur):
+    logging.debug("Adding 1 point for user: %s" %(uname))
+    cur.execute("""UPDATE points SET AMOUNT = AMOUNT + 1 WHERE NAME = ?""", (uname,))
     return
 
 def insert_user(uname,cur):
@@ -126,5 +134,4 @@ def insert_user(uname,cur):
     cur.execute('INSERT INTO points VALUES(?, ?)', (0, uname))
 
     return
-
 

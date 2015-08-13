@@ -68,7 +68,7 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
         # commands.start(data,msg,r)
 
         # Submissions Module
-        #placeholder_submission = submissions.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+        placeholder_submission = submissions.start(data,msg,r,cur,placeholder_submission)
 
         # Comments Module
         placeholder_comment = comments.start(data,msg,r,cur,placeholder_comment)

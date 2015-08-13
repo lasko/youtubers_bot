@@ -70,28 +70,28 @@ def process(data,msg,r,posts,cur,placeholder_submission):
                             # Make sure the user has at least 2 points to post this thread.
                             if points < 2:
                                 logging.debug("User: %s does not have enough points to do this." %(uname))
-                                #post.add_comment("You do not have enough points to do this.")
-                                mark_post_alreadydone(post.id,cur)
+                                r.send_message(uname, "Not enough points to submit to %s" %(data['settings']['subreddit']), msg['error_more_points'])
+                                result = post.remove()
+                                if result == None:
+                                    logging.debug("Failed to remove submission")
+                                # No need to mark it as done since this post is deleted.
                             else:
-                                logging.info("Subtracting 2 points from %s account balance" %(uname))
                                 # This user exists in the database so go ahead and subtract the 2 points for this post.
-                                set_points(uname,-2)
+                                remove_points(uname,cur)
                                 # Add this post to the database history as alreadydone
                                 mark_post_alreadydone(post.id,cur)
                         else: # If a user has no points, then they are not in the database.
                             logging.debug("User not found in database. Adding user with 0 points.")
                             insert_user(uname,cur)
-                            mark_post_alreadydone(post.id,cur)
                     else:
                         logging.debug("This user is on the Ignore list")
-                        # Mark posts made by the people on the ignore list as done so we skip them in the future
-                        mark_post_alreadydone(post.id,cur)
                 else:
                     # Does not contain flair text to subtract from.
                     continue
         else:
             logging.debug("This user/post was deleted: User is '[DELETED]'")
 
+        mark_post_alreadydone(post.id,cur)
         placeholder_submission = pid
 
 def mark_post_alreadydone(pid,cur):
@@ -122,11 +122,23 @@ def get_points(uname,cur):
         if rows[0]:
             return rows[0]
     else:
-        return False
+        insert_user(uname,cur)
+        cur.execute("SELECT * FROM points WHERE NAME = ?", (uname,))
+        rows = cur.fetchone()
+        if rows:
+            if rows[0]:
+                return rows[0]
+        else:
+            return False
 
-def set_points(uname,amount,cur):
-    logging.debug("Setting %s points for user: %s" %(amount, uname))
-    cur.execute("UPDATE points SET AMOUNT = AMOUNT ? WHERE NAME = ?", (uname,amount))
+def remove_points(uname,cur):
+    logging.debug("Removing 2 points for user: %s" %(uname))
+    cur.execute("UPDATE points SET AMOUNT = AMOUNT - 2 WHERE NAME = ?", (uname,))
+    return
+
+def add_points(uname,cur):
+    logging.debug("Adding 1 point for user: %s" %(uname))
+    cur.execute("""UPDATE points SET AMOUNT = AMOUNT + 1 WHERE NAME = ?""", (uname,))
     return
 
 def insert_user(uname,cur):
