@@ -7,7 +7,7 @@ import os
 import praw
 from settings import config
 import time
-from modules import account, comments, messages
+from modules import account, comments, messages, submissions
 import logging
 from logging.handlers import TimedRotatingFileHandler
 import sqlite3
@@ -67,8 +67,12 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
         # Commands module
         # commands.start(data,msg,r)
 
+        # Submissions Module
+        submissions.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+
         # Comments Module
-        comments.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+        #comments.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+
 
         # Wait 10 seconds
         wait_time = 10
