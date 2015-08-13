@@ -1,28 +1,6 @@
 # encoding: UTF-8
 
 
-# Scan subreddit for newest 20 posts
-
-# for each post
-#   get the authors name.
-#   if the username errors on AttibuteError
-#       set the author name to "[DELETED]"
-#   if the author name i:s not "[DELETED]"
-#       if the user has at least 2 points available
-#           if this post has flair in our list.
-#              Subtract 2 points from the user
-#           else
-#               Continue
-#       else
-#           Delete the post
-#           send a message to them directly explaining that they dont have enough points available to make a post
-#   Get all the comments in this post
-#       if the commenter has entered a review of more than 50 characters
-#           Check that the user is in the database, and add them if not found
-#           Add 1 point to their user in the database
-#
-
-
 # Import #
 ##########
 
