@@ -17,17 +17,17 @@ history = []
 # Functions #
 #############
 
-# Start the Submission module
-def start(data,msg,r,cur,placeholder_submission,placeholder_comment):
-    logging.debug("Starting Module: Submissions")
+# Start the Comments module
+def start(data,msg,r,cur,placeholder_comment):
+    logging.debug("Starting Module: Comments")
     # Get the subreddit object)
     subreddit = get_sub(r,data["settings"]["subreddit"])
     if placeholder_comment:
-        posts = sub_get_submissions(subreddit, placeholder_submission)
+        posts = sub_get_comments(subreddit, placeholder_comment)
     else:
-        posts = sub_get_submissions(subreddit)
-    process(data,msg,r,posts,cur,placeholder_submission,placeholder_comment)
-    return placeholder_submission, placeholder_comment
+        posts = sub_get_comments(subreddit)
+    process(data,msg,r,posts,cur,placeholder_comment)
+    return placeholder_comment
 
 # Gets the subreddit object from reddit
 def get_sub(r,sub_name):
@@ -35,64 +35,58 @@ def get_sub(r,sub_name):
     logging.info("Running in %s" % sub_name)
     return r.get_subreddit(sub_name)
 
-# Gets the newest submissions from the subreddit
-def sub_get_submissions(subreddit, placeholder_submission = None):
-    logging.debug("Getting Submissions")
-    if placeholder_submission:
-        return subreddit.get_new(placeholder = placeholder_submission)
+# Gets the newest comments from the subreddit
+def sub_get_comments(subreddit, placeholder_comment = None):
+    logging.debug("Getting Comments")
+    if placeholder_comment:
+        logging.debug("FOUND PLACE HOLDER!")
+        return subreddit.get_comments(placeholder = placeholder_comment)
     else:
-        return subreddit.get_new(limit=20) # Limits submissions retrieved
+        return subreddit.get_comments(limit=100) # Limits submissions retrieved
 
-# Processes the posts
-def process(data,msg,r,posts,cur,placeholder_submission,placeholder_comment):
-    logging.debug("Processing Post Submissions")
+# Processes the comments
+def process(data,msg,r,posts,cur,placeholder_comment):
+    logging.debug("Processing Post Comments")
     bot_name = str(data["settings"]["username"]).lower()
     for post in posts:
         pid = post.id
         pauthor = get_author(post)
+        pbody = post.body.lower()
         if pauthor != "[DELETED]":
-            # Check to make sure the link_flair_text exists, otherwise we'll error out.
-            if post.link_flair_text:
-                # Check to see if the flair_text exists in the flair to subtract points.
-                logging.debug("Checking Flair for post.")
-                post_status = check_alreadydone(post.id,cur)
-                if not post_status and post.link_flair_text in data["flair"]["subtract"]:
-                    logging.debug("Found a post not in history, and has Flair.")
-                    uname = post.author.name
-                    # The post is not in our history and contains the text "Review Video", or "Channel Critique"
-                    if uname not in data["ignore"]["users"]:
-                        logging.debug("Checking users points")
-                        points = get_points(uname,cur)
-                        if points == None:
-                            points = 0
-                        # Make sure points != False
-                        if points >=0 :
-                            # Make sure the user has at least 2 points to post this thread.
-                            if points < 2:
-                                logging.debug("User: %s does not have enough points to do this." %(uname))
-                                #post.add_comment("You do not have enough points to do this.")
-                                mark_post_alreadydone(post.id,cur)
-                            else:
-                                logging.info("Subtracting 2 points from %s account balance" %(uname))
-                                # This user exists in the database so go ahead and subtract the 2 points for this post.
-                                set_points(uname,-2)
-                                # Add this post to the database history as alreadydone
-                                mark_post_alreadydone(post.id,cur)
-                        else: # If a user has no points, then they are not in the database.
-                            logging.debug("User not found in database. Adding user with 0 points.")
-                            insert_user(uname,cur)
-                            mark_post_alreadydone(post.id,cur)
-                    else:
-                        logging.debug("This user is on the Ignore list")
-                        # Mark posts made by the people on the ignore list as done so we skip them in the future
-                        mark_post_alreadydone(post.id,cur)
+            comment_checked_status = check_alreadydone(pid,cur)
+            if not comment_checked_status:
+                logging.debug("Comment has not been checked. Checking now.")
+                if pbody in data["commands"]["userlevel"]:
+                    for command in data["commands"]["userlevel"]:
+                        result = pbody.find(command)
+                        if result != -1:
+                            logging.debug("Command: %s -- found in comment" %(command))
+                            points = get_points(post.author.name,cur)
+                            if points == False:
+                                insert_user(post.author.name,cur)
+                                points = get_points(post.author.name,cur)
+                            if points == None:
+                                points = 0
+                            # Reply to the user with their account balance.
+                            logging.debug("Replying with --  User: %s currently has a balance of %s" %(post.author.name, points))
+                            r.send_message(post.author.name, "Account Balance: %s" %(points), msg["account_balance"] %(data["settings"]["subreddit"],points),from_sr="/r/"+data['settings']['subreddit'],captcha = None)
+                            #post.reply("User: %s -- currently has a balance of %s." %(post.author.name,points))
                 else:
-                    # Does not contain flair text to subtract from.
-                    continue
+                    logging.debug("No commands found in comment")
+
+                #mark_post_alreadydone(pid,cur)
+            else:
+                continue
+                # This comment has already been checked. Skipping.
+                #logging.debug("This comment has already been checked. Skipping.")
         else:
             logging.debug("This user/post was deleted: User is '[DELETED]'")
+            mark_post_alreadydone(pid,cur)
+        placeholder_comment = pid
+    return placeholder_comment
 
 def mark_post_alreadydone(pid,cur):
+    logging.debug("Setting comment/post as done")
     cur.execute("INSERT INTO alreadydone VALUES(?)", (pid,))
     return
 

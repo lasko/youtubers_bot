@@ -18,16 +18,16 @@ history = []
 #############
 
 # Start the Submission module
-def start(data,msg,r,cur,placeholder_submission,placeholder_comment):
+def start(data,msg,r,cur,placeholder_submission):
     logging.debug("Starting Module: Submissions")
     # Get the subreddit object)
     subreddit = get_sub(r,data["settings"]["subreddit"])
-    if placeholder_comment:
+    if placeholder_submission:
         posts = sub_get_submissions(subreddit, placeholder_submission)
     else:
         posts = sub_get_submissions(subreddit)
-    process(data,msg,r,posts,cur,placeholder_submission,placeholder_comment)
-    return placeholder_submission, placeholder_comment
+    process(data,msg,r,posts,cur,placeholder_submission)
+    return placeholder_submission
 
 # Gets the subreddit object from reddit
 def get_sub(r,sub_name):
@@ -44,7 +44,7 @@ def sub_get_submissions(subreddit, placeholder_submission = None):
         return subreddit.get_new(limit=20) # Limits submissions retrieved
 
 # Processes the posts
-def process(data,msg,r,posts,cur,placeholder_submission,placeholder_comment):
+def process(data,msg,r,posts,cur,placeholder_submission):
     logging.debug("Processing Post Submissions")
     bot_name = str(data["settings"]["username"]).lower()
     for post in posts:
@@ -91,6 +91,8 @@ def process(data,msg,r,posts,cur,placeholder_submission,placeholder_comment):
                     continue
         else:
             logging.debug("This user/post was deleted: User is '[DELETED]'")
+
+        placeholder_submission = pid
 
 def mark_post_alreadydone(pid,cur):
     cur.execute("INSERT INTO alreadydone VALUES(?)", (pid,))

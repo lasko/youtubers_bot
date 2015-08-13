@@ -68,10 +68,10 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
         # commands.start(data,msg,r)
 
         # Submissions Module
-        submissions.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+        #placeholder_submission = submissions.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
 
         # Comments Module
-        #comments.start(data,msg,r,cur,placeholder_submission,placeholder_comment)
+        placeholder_comment = comments.start(data,msg,r,cur,placeholder_comment)
 
 
         # Wait 10 seconds
