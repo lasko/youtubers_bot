@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 # Login #
 #########
 
@@ -17,12 +19,12 @@ def start(data):
     return login(data)
 
 def login(data):
-    r = praw.Reddit(user_agent = data["running_username"] + ": Reddit Points System Moderator")
+    r = praw.Reddit(user_agent ="Point system tracker - designed by /u/bmheight for subreddit /r/youtubers")
     login_attempt = True
     while login_attempt:
         try:
-            logging.info(data["running_username"] + ": Attempting Login")
-            r.login(data["running_username"],data["running_password"])
+            logging.info(data["settings"]["username"] + ": Attempting Login")
+            r.login(data["settings"]["username"],data["settings"]["password"])
             logging.info("Login Successful")
             login_attempt = False
         except:
