@@ -1,0 +1,21 @@
+settings:
+    username: example 
+    password: example
+    subreddit: example
+    database: example.db
+    loglevel: debug
+
+commands:
+    userlevel:
+        - getscore
+        - balance
+        - rules
+    adminlevel:
+        - shutdown
+        - stop
+        - restart
+flair:
+    subtract: ["Review Video", "Channel Critique"]
+
+ignore:
+    users: ["TroaAxaltion", "twinsofliberty", "Lunatic14", "desenagrator", "InstantKevin", "DannyLunch", "DlmaoC", "RazorINC", "SpinalColumnA", "pollichops"]
