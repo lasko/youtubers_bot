@@ -1,0 +1,4 @@
+error_length: "This review does not include enough text to be counted as a review. Please contact the Mods if you feel this was in error."
+error_submission_history: "You have already been awarded points for this post"
+error_more_points: "Your thread was deleted because your current point balance is: %s. Review/Critique threads cost two points to post! You can earn more points by reviewing other peoples' videos and channels!"
+account_balance: "Your account on %s currently has a balance of: %s points."
