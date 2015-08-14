@@ -7,9 +7,10 @@ settings:
 
 commands:
     userlevel:
-        - getscore
-        - balance
-        - rules
+        - "!getscore"
+        - "!balance"
+        - "!rules"
+        - "getscore!"
     adminlevel:
         - shutdown
         - stop
@@ -19,3 +20,4 @@ flair:
 
 ignore:
     users: ["TroaAxaltion", "twinsofliberty", "Lunatic14", "desenagrator", "InstantKevin", "DannyLunch", "DlmaoC", "RazorINC", "SpinalColumnA", "pollichops"]
+
