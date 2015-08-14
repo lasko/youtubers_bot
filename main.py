@@ -54,6 +54,7 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
     cur = sql.cursor()
     cur.execute("CREATE TABLE IF NOT EXISTS points(AMOUNT, NAME)")
     cur.execute("CREATE TABLE IF NOT EXISTS alreadydone(THREADID)")
+    cur.execute("CREATE TABLE IF NOT EXISTS comments(THREADID, NAME, POINTS_ADDED, SUBMISSION_ID)")
     logging.info("Loaded SQL Tables")
 
     sql.commit()
@@ -71,7 +72,7 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
         placeholder_submission = submissions.start(data,msg,r,cur,placeholder_submission)
 
         # Comments Module
-        placeholder_comment = comments.start(data,msg,r,cur,placeholder_comment)
+        #placeholder_comment = comments.start(data,msg,r,cur,placeholder_comment)
 
 
         # Wait 10 seconds
