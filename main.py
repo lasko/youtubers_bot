@@ -52,9 +52,9 @@ def pointsbot(data,placeholder_submission,placeholder_comment):
     logging.info("Loaded SQL Database")
 
     cur = sql.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS points(AMOUNT, NAME)")
-    cur.execute("CREATE TABLE IF NOT EXISTS alreadydone(THREADID)")
-    cur.execute("CREATE TABLE IF NOT EXISTS comments(THREADID, NAME, POINTS_ADDED, SUBMISSION_ID)")
+    cur.execute("CREATE TABLE IF NOT EXISTS points(AMOUNT, NAME UNIQUE)")
+    cur.execute("CREATE TABLE IF NOT EXISTS alreadydone(THREADID UNIQUE)")
+    cur.execute("CREATE TABLE IF NOT EXISTS comments(THREADID UNIQUE, NAME, POINTS_ADDED, SUBMISSION_ID)")
     logging.info("Loaded SQL Tables")
 
     sql.commit()
