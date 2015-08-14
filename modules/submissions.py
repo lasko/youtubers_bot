@@ -141,12 +141,13 @@ def process(data,msg,r,posts,cur,placeholder_submission):
                     flat_comments = praw.helpers.flatten_tree(post.comments)
                     process_comments(data,msg,r,post,flat_comments,cur)
                 elif post_status and post.link_flair_text in data["flair"]["subtract"]:
-                    # Process the comments for the post.
+                    # If this post has already been marked as "Done" recheck the comments to make sure nothing new is here.
                     flat_comments = praw.helpers.flatten_tree(post.comments)
                     for comment in flat_comments:
-                        if comment.edited:
+                        if comment.edited: # If a comment was edited, reprocess the comment.
                             process_comments(data,msg,r,post,flat_comments,cur)
                         else:
+                            # If the comment was not edited, skip it.
                             continue
                 else:
                     # Does not contain flair text to subtract from.
