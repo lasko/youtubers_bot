@@ -106,7 +106,6 @@ def process(data,msg,r,posts,cur,placeholder_submission):
             # Check to make sure the link_flair_text exists, otherwise we'll error out.
             if post.link_flair_text:
                 # Check to see if the flair_text exists in the flair to subtract points.
-                logging.debug("Checking Flair for post.")
                 post_status = check_alreadydone(post.id,cur)
                 if not post_status and post.link_flair_text in data["flair"]["subtract"]:
                     logging.debug("Found a post not in history, and has Flair.")
