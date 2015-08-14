@@ -142,15 +142,14 @@ def process(data,msg,r,posts,cur,placeholder_submission):
                             insert_user(uname,cur)
                     else:
                         logging.debug("This user is on the Ignore list")
+                    # Process the comments for the post.
+                    flat_comments = praw.helpers.flatten_tree(post.comments)
+                    process_comments(data,msg,r,post,flat_comments,cur)
                 else:
                     # Does not contain flair text to subtract from.
                     continue
         else:
             logging.debug("This user/post was deleted: User is '[DELETED]'")
-
-        # Process the comments for the post.
-        flat_comments = praw.helpers.flatten_tree(post.comments)
-        process_comments(data,msg,r,post,flat_comments,cur)
 
         mark_post_alreadydone(post.id,cur)
         placeholder_submission = pid
