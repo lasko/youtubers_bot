@@ -53,14 +53,6 @@ def process(data,msg,r,posts,cur,placeholder_comment):
         pauthor = get_author(post)
         pbody = post.body.lower()
         if pauthor != "[DELETED]" and post.link_author is not "[deleted]":
-            # TODO
-            # Get the Parent ID, username and store them in a dictionary.
-            # Then use this dictionary to compare -- that way we dont give a user
-            # multiple points for multiple posts to the same thread.
-            # NOTE: Maybe the database needs another column
-            #       in the alreadydone table to indicate the "author" name, and
-            #       parent name.
-            #       This way it would be easier to keep track of this in the DB.
             comment_checked_status = check_alreadydone(pid,cur)
             if not comment_checked_status:
                 logging.debug("Comment has not been checked. Checking now.")
