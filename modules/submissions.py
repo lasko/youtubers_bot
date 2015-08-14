@@ -10,11 +10,6 @@ import logging
 import time
 from pprint import pprint
 
-# Variables #
-#############
-
-history = []
-
 # Functions #
 #############
 
