@@ -116,11 +116,11 @@ def process(data,msg,r,posts,cur,placeholder_submission):
                             # Make sure the user has at least 2 points to post this thread.
                             if points < 2:
                                 logging.debug("User: %s does not have enough points to do this." %(uname))
-                                #logging.debug("I WOULD NORMALLY REMOVE THIS POST")
-                                r.send_message(uname, "Not enough points to submit to %s" %(data['settings']['subreddit']), msg['error_more_points'])
-                                result = post.remove()
-                                if result == None:
-                                    logging.debug("Failed to remove submission")
+                                logging.debug("I WOULD NORMALLY REMOVE THIS POST")
+                                #r.send_message(uname, "Not enough points to submit to %s" %(data['settings']['subreddit']), msg['error_more_points'])
+                                #result = post.remove()
+                                #if result == None:
+                                #    logging.debug("Failed to remove submission")
                                 mark_post_alreadydone(post.id,cur)
                             else:
                                 # This user exists in the database so go ahead and subtract the 2 points for this post.
@@ -152,6 +152,7 @@ def process(data,msg,r,posts,cur,placeholder_submission):
 
         mark_post_alreadydone(post.id,cur)
         placeholder_submission = pid
+        return placeholder_submission
 
 def mark_post_alreadydone(pid,cur):
     cur.execute("INSERT INTO alreadydone VALUES(?)", (pid,))
@@ -208,20 +209,19 @@ def insert_user(uname,cur):
 def comment_set(comment_id,post_id,uname,cur,action=None,points=None):
     if action == "UPDATE":
         cur.execute("""UPDATE comments SET POINTS_ADDED = 1 WHERE THREADID = ? AND NAME=? AND SUBMISSION_ID = ?""", (comment_id,uname,post_id))
+        return
     elif action == "INSERT":
         if points:
             logging.debug("Adding comment to database and setting its status as completed. Points added: %s" % (points))
         else:
             logging.debug("Adding comment to database but comment did not meet requirements. Setting points to Null until edited")
         cur.execute('INSERT INTO comments VALUES(?, ?, ?, ?)', (comment_id, uname, points, post_id))
+        return
     elif action == "SELECT":
         cur.execute('SELECT * FROM comments WHERE SUBMISSION_ID = ? AND NAME=?', (post_id, uname))
         rows = cur.fetchall()
         return rows
-
     return
-
-
 
 def get_users_commented(post_id,uname,cur):
     cur.execute('SELECT * FROM comments WHERE SUBMISSION_ID = ? AND NAME=?', (post_id, uname))
