@@ -116,12 +116,12 @@ def process(data,msg,r,posts,cur,placeholder_submission):
                             # Make sure the user has at least 2 points to post this thread.
                             if points < 2:
                                 logging.debug("User: %s does not have enough points to do this." %(uname))
-                                logging.debug("I WOULD NORMALLY REMOVE THIS POST")
-                                #r.send_message(uname, "Not enough points to submit to %s" %(data['settings']['subreddit']), msg['error_more_points'])
-                                #result = post.remove()
-                                #if result == None:
-                                #    logging.debug("Failed to remove submission")
-                                # No need to mark it as done since this post is deleted.
+                                #logging.debug("I WOULD NORMALLY REMOVE THIS POST")
+                                r.send_message(uname, "Not enough points to submit to %s" %(data['settings']['subreddit']), msg['error_more_points'])
+                                result = post.remove()
+                                if result == None:
+                                    logging.debug("Failed to remove submission")
+                                mark_post_alreadydone(post.id,cur)
                             else:
                                 # This user exists in the database so go ahead and subtract the 2 points for this post.
                                 remove_points(uname,cur)
