@@ -60,7 +60,6 @@ def process_comments(data,msg,r,post,flat_comments,cur):
                 # Make sure it meets the comment length for a review
                 if len(comment.body) >= 50:
                     # Give the user a point
-                    logging.debug("Adding 1 point to User: %s" %(cauthor))
                     add_points(cauthor,cur)
                     comment_set(comment.id,post.id,cauthor,cur,"INSERT",1)
                 else:
@@ -95,9 +94,6 @@ def process_comments(data,msg,r,post,flat_comments,cur):
 
         else:
             logging.debug('Skipping this user. They are on the ignore list')
-
-
-
 
 # Processes the posts
 def process(data,msg,r,posts,cur,placeholder_submission):
